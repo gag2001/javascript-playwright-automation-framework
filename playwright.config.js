@@ -7,7 +7,8 @@ module.exports = defineConfig({
   forbidOnly: env.isCI,
   // The public demo site is occasionally flaky (503s, ad overlays), so retry in CI.
   retries: env.isCI ? 2 : 0,
-  workers: env.isCI ? 2 : undefined,
+  // The shared demo site queues requests under load, so keep parallelism modest.
+  workers: 2,
   timeout: 30_000,
   expect: { timeout: 10_000 },
   reporter: [['list'], ['html', { open: 'never' }]],
@@ -26,7 +27,8 @@ module.exports = defineConfig({
     {
       name: 'api',
       testDir: './tests/api',
-      use: { baseURL: env.apiUrl },
+      // Trailing slash lets services use relative paths like 'productsList'.
+      use: { baseURL: `${env.apiUrl}/` },
     },
   ],
 });
